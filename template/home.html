@@ -1,0 +1,277 @@
+<html>
+<head>
+<title> Dashboard </title>
+<link href="https://fonts.googleapis.com/css?family=Krona+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="static/loginstyle.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+	body {
+		background-image: url('https://i.ibb.co/2jgXXLq/bg.jpg');
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: cover;
+	}
+    #customers {
+      font-family: Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    #customers td, #customers th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    #customers tr:nth-child(even){background-color: #f2f2f2;}
+
+    #customers tr:hover {background-color: #ddd;}
+
+    #customers th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .today{
+        display: none;
+    }
+    .last-week{
+        display: none;
+    }
+    .buttons{
+        display: inline-block;
+    }
+    .activebtn{
+        background: rgba(2, 63, 120,1);
+    }
+    .canvasstyle{
+        display: inline-block;
+        /* float: left; */
+    }
+</style>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Dashboard</a>
+    </nav>
+    <br><br>
+    <center>
+        <h2 align="center" style="color: white;" >TRASH DATA</h2>
+		<div class="buttons">
+			<button class="alltime-btn activebtn">All-Time</button>
+			<button class="lastweek-btn">This Week</button>
+			<button class="today-btn">Today</button>
+		</div>
+	</center>
+	<div class="container">
+		<div class ="all-time">
+			<table class="table table-bordered table-dark">
+				<thead>
+				<tr>
+					<th>Timestamp</th>
+					<th>Category</th>
+					<th>Weight</th>
+
+				</tr>
+				</thead>
+				<tbody>
+					{% for row in allTimeValues %}
+						<tr>
+							<td>{{row['datetime']}}</td>
+							<td>{{row['category']}}</td>
+							<td>{{row['weight']}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class ="today">
+			<table class="table table-bordered table-dark">
+				<thead>
+				<tr>
+					<th>Timestamp</th>
+					<th>Category</th>
+					<th>Weight</th>
+
+				</tr>
+				</thead>
+				<tbody>
+					{% for row in todayValues %}
+						<tr>
+							<td>{{row['datetime']}}</td>
+							<td>{{row['category']}}</td>
+							<td>{{row['weight']}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class ="last-week">
+			<table class="table table-bordered table-dark">
+				<thead>
+				<tr>
+					<th>Timestamp</th>
+					<th>Category</th>
+					<th>Weight</th>
+
+				</tr>
+				</thead>
+				<tbody>
+					{% for row in lastWeekValues %}
+						<tr>
+							<td>{{row['datetime']}}</td>
+							<td>{{row['category']}}</td>
+							<td>{{row['weight']}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+
+	<div class="viz">
+		<h2 align="center" style="color: white;" >VISUALISATION</h2><br><br>
+		<div class="canvasstyle d-flex justify-content-center" >
+			<canvas id="lineChartbio" width="550" height="300" style="display: inline-block; background-color:white; padding: 25px;"></canvas>
+            <br>
+            
+        </div>
+        <div align="center" style="color:white;">
+            Wastes classified as Bio-Degradable
+        </div>
+		<br><br>
+		<div class="canvasstyle d-flex justify-content-center">
+			<canvas id="lineChartnon" width="550" height="300" style="display: inline-block; background-color:white; padding: 25px;"></canvas>
+            <br>
+        </div>
+        <div align="center" style="color:white;">
+            Wastes classified as Non-BioDegradable
+        </div>
+		<br><br>>
+		<div class="canvasstyle d-flex justify-content-center">
+			<canvas id="lineChartweights" width="550" height="300" style="display: inline-block; background-color:white; padding: 25px;"></canvas>
+            <br>
+      
+        </div>
+        <div align="center" style="color:white;">
+            Weights of Trash Stored
+        </div>
+	</div>
+	<div style="visibility:hidden;">
+	HII
+	</div>
+	
+<script>
+$(document).ready(function(){
+$('.alltime-btn').click(function(){
+    // var link=$(this).val();
+    // console.log(link);
+    // $(".controlaud").attr("src",link);
+    // $(".controlvid").attr("src","#");
+    $(".today").css("display","none");
+    $(".last-week").css("display","none");
+    $(".all-time").css("display","block");
+    $("button").removeClass("activebtn");
+});
+$('.today-btn').click(function(){
+    // var link=$(this).val();
+    // console.log(link);
+    // $(".controlaud").attr("src",link);
+    // $(".controlvid").attr("src","#");
+    $(".all-time").css("display","none");
+    $(".last-week").css("display","none");
+    $(".today").css("display","block");
+    $("button").removeClass("activebtn");
+});
+
+$('.lastweek-btn').click(function(){
+    // var link=$(this).val();
+    // console.log(link);
+    // $(".controlaud").attr("src",link);
+    // $(".controlvid").attr("src","#");
+    $(".all-time").css("display","none");
+    $(".today").css("display","none");
+    $(".last-week").css("display","block");
+    $("button").removeClass("activebtn");
+
+});
+
+});
+
+var ctx = document.getElementById("lineChartbio").getContext("2d");
+var lineChartbio = new Chart(ctx,{
+    type: "line",
+    data: {
+        labels: {{ labelsbio | safe }},
+        datasets: [
+            {
+                label: "Biodegradable Waste",
+                data: {{ valuesbio | safe }},
+                fill: false,
+                borderColor: "rgb(255, 0, 0)",
+                lineTension: 0.1
+            }
+        ]
+    },
+    options: {
+        responsive: false
+    }
+
+});
+
+var ctx2 = document.getElementById("lineChartnon").getContext("2d");
+var lineChartnon = new Chart(ctx2,{
+    type: "line",
+    data: {
+        labels: {{ labelsnon | safe }},
+        datasets: [
+            {
+                label: "Non-Biodegradable Waste",
+                data: {{ valuesnon | safe }},
+                fill: false,
+                borderColor: "rgb(255, 0, 0)",
+                lineTension: 0.1
+            }
+        ]
+    },
+    options: {
+        responsive: false
+    }
+
+});
+
+var ctx3 = document.getElementById("lineChartweights").getContext("2d");
+var lineChartweights = new Chart(ctx3,{
+    type: "line",
+    data: {
+        labels: {{ labelsbioweight | safe }},
+        datasets: [
+            {
+                label: "Weight of Waste",
+                data: {{ valuesbioweight | safe }},
+                fill: false,
+                borderColor: "rgb(255, 0, 0)",
+                lineTension: 0.1
+            }
+        ]
+    },
+    options: {
+        responsive: false
+    }
+
+});
+</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
